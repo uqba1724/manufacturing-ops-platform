@@ -198,8 +198,15 @@ def generate_bom(extracted: dict) -> list:
 
 def get_material_rate(material: str) -> float:
     """Returns the cost per kg for a given material string."""
+    material_lower = material.lower()
     for key, rate in COST_RATES["materials"].items():
-        if key.lower() in material.lower():
+        key_lower = key.lower()
+        # Check both directions to handle variable word order
+        if key_lower in material_lower or material_lower in key_lower:
+            return rate
+        # Also check if all significant words from the key appear in material
+        key_words = [w for w in key_lower.split() if len(w) > 2]
+        if all(w in material_lower for w in key_words):
             return rate
     return COST_RATES["materials"]["default"]
 
