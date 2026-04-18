@@ -16,6 +16,10 @@ from src.api.schemas import (
     DowntimeEventSchema, DefectSchema, QuotationSchema,
     BOMItemSchema, MachineEventSchema, KPISummarySchema
 )
+from src.database.db import engine, Base
+from src.database import models
+from src.database.init_db import init_db
+from src.database.seed_data import seed_data
 
 # Create the FastAPI application instance
 app = FastAPI(
@@ -24,6 +28,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
+@app.on_event("startup")
+async def startup_event():
+    # Initialise database tables if they don't exist
+    init_db()
+    # Seed data if the database is empty
+    seed_data()
+    print("Platform startup complete.")
 
 # --- MACHINES ---
 
